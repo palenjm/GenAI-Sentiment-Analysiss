@@ -4,12 +4,18 @@ import pandas as pd
 import os
 import plotly.express as px
 import requests
+# import packages
+import os
+import streamlit as st
+import pandas as pd
+import requests
+import plotly.express as px
 from dotenv import load_dotenv
 
 # Load environment variables and verify
 load_dotenv()
 
-# Debug: Check if environment variables are loaded
+# Check if environment variables are loaded
 if not os.getenv("HUGGINGFACE_API_KEY"):
     st.error("⚠️ HUGGINGFACE_API_KEY not found in environment variables!")
     st.info("Please make sure your .env file contains: HUGGINGFACE_API_KEY=your_token_here")
@@ -30,16 +36,17 @@ def get_sentiment(text):
     try:
         # Use a sentiment model specifically designed for review analysis
         api_url = "https://api-inference.huggingface.co/models/Seethal/sentiment_analysis_generic_dataset"
+        api_key = os.getenv('HUGGINGFACE_API_KEY')
+        
         headers = {
-            "Authorization": f"Bearer {os.getenv('HUGGINGFACE_API_KEY')}"
+            "Authorization": f"Bearer {api_key}"
         }
         payload = {"inputs": text}
         response = requests.post(api_url, headers=headers, json=payload)
         
         # Check if the response is successful
         if response.status_code != 200:
-            st.error(f"API Error: Status {response.status_code}")
-            st.error(f"Response: {response.text}")
+            st.error("❌ Error analyzing sentiment. Please try again later.")
             return "Neutral"
             
         result = response.json()
